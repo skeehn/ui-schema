@@ -1,0 +1,11 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/uischema-core" },
+    { "path": "packages/uischema-compressed" },
+    { "path": "packages/uischema-bridges" },
+    { "path": "packages/uischema-protocol" },
+    { "path": "packages/uischema-react" },
+    { "path": "packages/uischema-cli" }
+  ]
+}

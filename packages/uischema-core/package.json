@@ -1,0 +1,22 @@
+{
+  "name": "@uischema/core",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "schema"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
+    "./schema/uischema.json": "./schema/uischema.json"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}

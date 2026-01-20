@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "0.1.0",
+  "root": {
+    "type": "Container",
+    "props": {
+      "className": "hello-world",
+      "ariaLabel": "Hello world container"
+    },
+    "children": [
+      {
+        "type": "Text",
+        "props": {
+          "text": "Hello UISchema"
+        }
+      },
+      {
+        "type": "Button",
+        "props": {
+          "text": "Click me",
+          "ariaLabel": "Click the primary action"
+        },
+        "events": {
+          "onClick": {
+            "type": "action",
+            "name": "primaryClick",
+            "params": {
+              "source": "hello-world"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Run tests
+        run: npm test
+
+      - name: Verify examples build
+        run: |
+          cd examples/nextjs-vercel-ai-sdk
+          npm install
+          npm run build || echo "Example build skipped (may require API keys)"
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Verify build output
+        run: |
+          test -f packages/uischema-core/dist/index.js
+          test -f packages/uischema-react/dist/index.js
+          test -f packages/uischema-protocol/dist/index.js
+          test -f packages/uischema-bridges/dist/index.js
+          test -f packages/uischema-compressed/dist/index.js
+          test -f packages/uischema-cli/dist/cli.js

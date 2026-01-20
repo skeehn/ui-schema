@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uischema.dev/schema/uischema.json",
+  "title": "UISchema",
+  "type": "object",
+  "required": ["root"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "description": "Semantic version of the UISchema document."
+    },
+    "root": {
+      "$ref": "#/$defs/node"
+    },
+    "meta": {
+      "$ref": "#/$defs/meta"
+    }
+  },
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "locale": { "type": "string" }
+      }
+    },
+    "props": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": { "type": "string" },
+        "className": { "type": "string" },
+        "style": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        },
+        "ariaLabel": { "type": "string" },
+        "role": { "type": "string" },
+        "tabIndex": { "type": "integer", "minimum": -1, "maximum": 32767 },
+        "text": { "type": "string" },
+        "value": { "type": ["string", "number", "boolean", "null"] },
+        "placeholder": { "type": "string" },
+        "href": { "type": "string" },
+        "src": { "type": "string" }
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "JSON Pointer to bind against the runtime data tree."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "array", "object", "date"]
+        },
+        "default": {},
+        "transform": {
+          "type": "string",
+          "description": "Optional name of a runtime transform to apply."
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "name"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["action", "navigate", "submit", "custom"]
+        },
+        "name": { "type": "string" },
+        "params": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "id": { "type": "string" },
+        "key": { "type": "string" },
+        "type": {
+          "description": "Component type. Core types are enumerated; extensions may use x- or custom: prefixes.",
+          "anyOf": [
+            {
+              "enum": [
+                "Container",
+                "Row",
+                "Column",
+                "Grid",
+                "Card",
+                "List",
+                "ListItem",
+                "Text",
+                "Image",
+                "Icon",
+                "Badge",
+                "Button",
+                "Link",
+                "Input",
+                "Textarea",
+                "Select",
+                "Checkbox",
+                "RadioGroup",
+                "Switch",
+                "Slider",
+                "Form",
+                "Divider",
+                "Spacer"
+              ]
+            },
+            { "pattern": "^x-" },
+            { "pattern": "^custom:" }
+          ]
+        },
+        "props": { "$ref": "#/$defs/props" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/node" }
+        },
+        "slots": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              { "$ref": "#/$defs/node" },
+              {
+                "type": "array",
+                "items": { "$ref": "#/$defs/node" }
+              }
+            ]
+          }
+        },
+        "bindings": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/binding" }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/event" }
+        },
+        "meta": { "$ref": "#/$defs/meta" },
+        "ext": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "Button",
+                  "Link",
+                  "Input",
+                  "Textarea",
+                  "Select",
+                  "Checkbox",
+                  "RadioGroup",
+                  "Switch",
+                  "Slider"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "props": {
+                "required": ["ariaLabel"]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

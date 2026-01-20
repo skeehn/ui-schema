@@ -1,0 +1,22 @@
+{
+  "name": "@uischema/bridges",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@uischema/core": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

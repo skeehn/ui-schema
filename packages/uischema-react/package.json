@@ -1,0 +1,24 @@
+{
+  "name": "@uischema/react",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@uischema/core": "*",
+    "@uischema/protocol": "*"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

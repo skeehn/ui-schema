@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "composite": true
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    { "path": "../uischema-core" },
+    { "path": "../uischema-protocol" }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "uischema",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "clean": "rm -rf packages/*/dist packages/*/*.tsbuildinfo",
+    "prebuild": "npm run clean",
+    "build": "tsc -b",
+    "type-check": "tsc --noEmit",
+    "test": "node scripts/smoke-test.js",
+    "test:simple": "node scripts/test-simple.js",
+    "smoke": "node scripts/smoke-test.js",
+    "test:all": "node scripts/test-all.js",
+    "test:ai": "node scripts/test-ai-integration.js",
+    "test:ai:simple": "node examples/test-ai-simple.js",
+    "test:core": "node -e \"require('@uischema/core'); console.log('✅ Core package loaded')\"",
+    "test:compressed": "node -e \"require('@uischema/compressed'); console.log('✅ Compressed package loaded')\"",
+    "test:bridges": "node -e \"require('@uischema/bridges'); console.log('✅ Bridges package loaded')\"",
+    "test:protocol": "node -e \"require('@uischema/protocol'); console.log('✅ Protocol package loaded')\"",
+    "test:react": "node -e \"require('@uischema/react'); console.log('✅ React package loaded')\"",
+    "test:cli": "npx @uischema/cli validate examples/hello-world/uischema.json",
+    "test:openai": "node examples/test-openai-real.js",
+    "test:vercel-ai": "node examples/test-vercel-ai-real.js",
+    "test:everything": "node scripts/test-everything.js",
+    "verify:build": "node scripts/verify-build.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.3.4",
+    "dotenv": "^16.4.5",
+    "react": "^18.3.1",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.12",
+    "ai": "^6.0.41"
+  }
+}

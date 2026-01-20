@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@uischema/core": [
+        "packages/uischema-core/src/index.ts"
+      ],
+      "@uischema/compressed": [
+        "packages/uischema-compressed/src/index.ts"
+      ],
+      "@uischema/bridges": [
+        "packages/uischema-bridges/src/index.ts"
+      ],
+      "@uischema/protocol": [
+        "packages/uischema-protocol/src/index.ts"
+      ],
+      "@uischema/react": [
+        "packages/uischema-react/src/index.ts"
+      ],
+      "@uischema/cli": [
+        "packages/uischema-cli/src/index.ts"
+      ]
+    }
+  }
+}
