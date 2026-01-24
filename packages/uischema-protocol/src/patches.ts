@@ -14,6 +14,9 @@ export type PatchOperation = {
  * Parse JSON Pointer path to array of segments
  */
 const parsePath = (path: string): string[] => {
+  if (path === "" || path === "/") {
+    return [];
+  }
   if (!path.startsWith("/")) {
     throw new Error(`Path must start with "/": ${path}`);
   }
@@ -21,6 +24,16 @@ const parsePath = (path: string): string[] => {
     .slice(1)
     .split("/")
     .map((segment) => segment.replace(/~1/g, "/").replace(/~0/g, "~"));
+};
+
+const parseArrayIndex = (segment: string): number | "append" | null => {
+  if (segment === "-") {
+    return "append";
+  }
+  if (!/^(0|[1-9]\d*)$/.test(segment)) {
+    return null;
+  }
+  return Number(segment);
 };
 
 /**
@@ -31,7 +44,18 @@ const applyPatch = (target: UISchemaNode, patch: PatchOperation): UISchemaNode =
   const segments = parsePath(patch.path);
 
   if (segments.length === 0) {
-    throw new Error("Path cannot be empty");
+    switch (patch.op) {
+      case "set":
+      case "replace":
+        if (patch.value === undefined) {
+          throw new Error("Root patch requires a value.");
+        }
+        return patch.value as UISchemaNode;
+      case "add":
+        throw new Error("Cannot add at the document root.");
+      case "remove":
+        throw new Error("Cannot remove the document root.");
+    }
   }
 
   let current: any = clone;
@@ -41,20 +65,39 @@ const applyPatch = (target: UISchemaNode, patch: PatchOperation): UISchemaNode =
       if (patch.op === "remove") {
         return clone; // Path doesn't exist, nothing to remove
       }
-      current[key] = {};
+      const nextSegment = segments[i + 1];
+      const nextIsArrayIndex = parseArrayIndex(nextSegment) !== null;
+      current[key] = nextIsArrayIndex ? [] : {};
     }
     current = current[key];
   }
 
   const finalKey = segments[segments.length - 1];
 
+  const arrayIndex = Array.isArray(current) ? parseArrayIndex(finalKey) : null;
+
   switch (patch.op) {
     case "set":
     case "replace":
-      current[finalKey] = patch.value;
+      if (arrayIndex !== null) {
+        if (arrayIndex === "append") {
+          throw new Error(`Cannot ${patch.op} at append position: ${patch.path}`);
+        }
+        (current as unknown[])[arrayIndex] = patch.value;
+      } else {
+        current[finalKey] = patch.value;
+      }
       break;
     case "add":
-      if (Array.isArray(current[finalKey])) {
+      if (Array.isArray(current)) {
+        if (arrayIndex === "append") {
+          current.push(patch.value);
+        } else if (typeof arrayIndex === "number") {
+          current.splice(arrayIndex, 0, patch.value);
+        } else {
+          throw new Error(`Invalid array index at path: ${patch.path}`);
+        }
+      } else if (Array.isArray(current[finalKey])) {
         current[finalKey].push(patch.value);
       } else if (current[finalKey] === undefined) {
         current[finalKey] = [patch.value];
@@ -63,7 +106,14 @@ const applyPatch = (target: UISchemaNode, patch: PatchOperation): UISchemaNode =
       }
       break;
     case "remove":
-      delete current[finalKey];
+      if (Array.isArray(current)) {
+        if (typeof arrayIndex !== "number") {
+          throw new Error(`Invalid array index at path: ${patch.path}`);
+        }
+        current.splice(arrayIndex, 1);
+      } else {
+        delete current[finalKey];
+      }
       break;
   }
 

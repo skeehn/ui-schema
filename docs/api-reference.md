@@ -150,7 +150,7 @@ import {
 } from '@uischema/protocol';
 
 // Create events
-const updateEvent = createUIUpdate(node, '/root');
+const updateEvent = createUIUpdate(node, '/');
 const interactionEvent = createUIInteraction('Button', 'onClick', { id: 'btn1' });
 
 // Serialize for transport
