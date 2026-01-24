@@ -125,47 +125,46 @@ type PatchOperation = {
 
 ### JSON Pointer Paths
 
-Paths use JSON Pointer format (`/root/children/0/props/text`):
+Paths use JSON Pointer format (`/children/0/props/text`) relative to the root node:
 
-- `/` - Root
-- `/root` - Root node
-- `/root/children/0` - First child
-- `/root/children/0/props/text` - Text prop of first child
-- `/root/children/-` - Append to children array
+- `/` - Root node
+- `/children/0` - First child
+- `/children/0/props/text` - Text prop of first child
+- `/children/-` - Append to children array
 
 ### Examples
 
 #### Set Operation
 
 ```json
-{"op": "set", "path": "/root/props/ariaLabel", "value": "Main container"}
+{"op": "set", "path": "/props/ariaLabel", "value": "Main container"}
 ```
 
 #### Add Operation
 
 ```json
-{"op": "add", "path": "/root/children/-", "value": {"type": "Text", "props": {"text": "New item"}}}
+{"op": "add", "path": "/children/-", "value": {"type": "Text", "props": {"text": "New item"}}}
 ```
 
 #### Replace Operation
 
 ```json
-{"op": "replace", "path": "/root/children/0/props/text", "value": "Updated text"}
+{"op": "replace", "path": "/children/0/props/text", "value": "Updated text"}
 ```
 
 #### Remove Operation
 
 ```json
-{"op": "remove", "path": "/root/children/1"}
+{"op": "remove", "path": "/children/1"}
 ```
 
 ### JSONL Stream Example
 
 ```
-{"op": "set", "path": "/root", "value": {"type": "Container", "props": {"ariaLabel": "Dashboard"}}}
-{"op": "add", "path": "/root/children/-", "value": {"type": "Text", "props": {"text": "Loading..."}}}
-{"op": "replace", "path": "/root/children/0/props/text", "value": "Dashboard Content"}
-{"op": "add", "path": "/root/children/-", "value": {"type": "Button", "props": {"text": "Submit", "ariaLabel": "Submit button"}}}
+{"op": "set", "path": "/", "value": {"type": "Container", "props": {"ariaLabel": "Dashboard"}}}
+{"op": "add", "path": "/children/-", "value": {"type": "Text", "props": {"text": "Loading..."}}}
+{"op": "replace", "path": "/children/0/props/text", "value": "Dashboard Content"}
+{"op": "add", "path": "/children/-", "value": {"type": "Button", "props": {"text": "Submit", "ariaLabel": "Submit button"}}}
 ```
 
 ## Progressive Rendering
