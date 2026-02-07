@@ -14,12 +14,15 @@ export {
 export {
   createUIUpdate,
   createUIInteraction,
+  createUIEvaluation,
   isUIUpdate,
   isUIInteraction,
+  isUIEvaluation,
   serializeEvent,
   deserializeEvent,
   type UIUpdateEvent,
   type UIInteractionEvent,
+  type UIEvaluationEvent,
   type UIEvent
 } from "./events";
 

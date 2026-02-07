@@ -31,7 +31,27 @@ export type UIInteractionEvent = {
   timestamp?: number;
 };
 
-export type UIEvent = UIUpdateEvent | UIInteractionEvent;
+/**
+ * UI → Agent: UI evaluation event (accessibility reports, audits)
+ */
+export type UIEvaluationEvent = {
+  type: "ui.evaluation";
+  payload: {
+    report: {
+      score: number;
+      issues: Array<{
+        criterion: string;
+        level: string;
+        status: string;
+        message: string;
+        path?: string;
+      }>;
+    };
+  };
+  timestamp?: number;
+};
+
+export type UIEvent = UIUpdateEvent | UIInteractionEvent | UIEvaluationEvent;
 
 /**
  * Create UI update event
@@ -69,6 +89,19 @@ export const createUIInteraction = (
 };
 
 /**
+ * Create UI evaluation event
+ */
+export const createUIEvaluation = (report: UIEvaluationEvent["payload"]["report"]): UIEvaluationEvent => {
+  return {
+    type: "ui.evaluation",
+    payload: {
+      report
+    },
+    timestamp: Date.now()
+  };
+};
+
+/**
  * Check if event is UI update
  */
 export const isUIUpdate = (event: UIEvent): event is UIUpdateEvent => {
@@ -83,6 +116,13 @@ export const isUIInteraction = (event: UIEvent): event is UIInteractionEvent => 
 };
 
 /**
+ * Check if event is UI evaluation
+ */
+export const isUIEvaluation = (event: UIEvent): event is UIEvaluationEvent => {
+  return event.type === "ui.evaluation";
+};
+
+/**
  * Serialize event to JSON (for transport)
  */
 export const serializeEvent = (event: UIEvent): string => {
@@ -94,7 +134,11 @@ export const serializeEvent = (event: UIEvent): string => {
  */
 export const deserializeEvent = (json: string): UIEvent => {
   const parsed = JSON.parse(json);
-  if (parsed.type === "ui.update" || parsed.type === "ui.interaction") {
+  if (
+    parsed.type === "ui.update" ||
+    parsed.type === "ui.interaction" ||
+    parsed.type === "ui.evaluation"
+  ) {
     return parsed as UIEvent;
   }
   throw new Error(`Invalid event type: ${parsed.type}`);
