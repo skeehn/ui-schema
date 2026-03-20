@@ -1,5 +1,6 @@
 import React from "react";
 import type { UISchemaNode, UISchemaProps } from "@uischema/core";
+import { normalizeProps } from "../utils/props";
 
 export type UISchemaComponentProps = {
   node: UISchemaNode;
@@ -8,14 +9,6 @@ export type UISchemaComponentProps = {
 };
 
 export type UISchemaComponent = (props: UISchemaComponentProps) => React.ReactElement | null;
-
-const normalizeProps = (props?: UISchemaProps) => {
-  if (!props) {
-    return undefined;
-  }
-  const { ariaLabel, ...rest } = props;
-  return ariaLabel ? { ...rest, "aria-label": ariaLabel } : rest;
-};
 
 const defaultRenderers: Record<string, UISchemaComponent> = {
   Container: ({ children, node }) =>

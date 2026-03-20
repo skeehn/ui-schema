@@ -27,6 +27,15 @@
       "@uischema/react": [
         "packages/uischema-react/src/index.ts"
       ],
+      "@uischema/dom": [
+        "packages/uischema-dom/src/index.ts"
+      ],
+      "@uischema/eval": [
+        "packages/uischema-eval/src/index.ts"
+      ],
+      "@uischema/vue": [
+        "packages/uischema-vue/src/index.ts"
+      ],
       "@uischema/cli": [
         "packages/uischema-cli/src/index.ts"
       ]

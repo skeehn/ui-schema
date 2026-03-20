@@ -2,6 +2,7 @@ import React from "react";
 import type { UISchemaDocument, UISchemaNode } from "@uischema/core";
 import { getComponent } from "../registry/components";
 import type { UISchemaComponentProps } from "../registry/components";
+import { normalizeProps as normalizeUISchemaProps } from "../utils/props";
 
 export type UISchemaRendererProps = {
   schema: UISchemaDocument | UISchemaNode;
@@ -9,11 +10,8 @@ export type UISchemaRendererProps = {
 };
 
 const normalizeProps = (node: UISchemaNode) => {
-  const props = node.props ?? {};
-  const { ariaLabel, ...rest } = props;
   return {
-    ...rest,
-    ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
+    ...normalizeUISchemaProps(node.props),
     "data-uischema-type": node.type
   };
 };

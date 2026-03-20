@@ -37,10 +37,9 @@ const parseArrayIndex = (segment: string): number | "append" | null => {
 };
 
 /**
- * Apply a single patch operation to a node tree
+ * Apply a single patch operation to a node tree using structural sharing.
  */
 const applyPatch = (target: UISchemaNode, patch: PatchOperation): UISchemaNode => {
-  const clone: UISchemaNode = JSON.parse(JSON.stringify(target));
   const segments = parsePath(patch.path);
 
   if (segments.length === 0) {
@@ -58,66 +57,82 @@ const applyPatch = (target: UISchemaNode, patch: PatchOperation): UISchemaNode =
     }
   }
 
-  let current: any = clone;
-  for (let i = 0; i < segments.length - 1; i += 1) {
-    const key = segments[i];
-    if (current[key] === undefined) {
-      if (patch.op === "remove") {
-        return clone; // Path doesn't exist, nothing to remove
+  const update = (obj: any, pathSegments: string[]): any => {
+    const [head, ...tail] = pathSegments;
+    const isLast = tail.length === 0;
+
+    if (isLast) {
+      if (Array.isArray(obj)) {
+        const index = parseArrayIndex(head);
+        if (index === null) {
+          throw new Error(`Invalid array index at path: ${patch.path}`);
+        }
+        const next = [...obj];
+        if (patch.op === "set" || patch.op === "replace") {
+          if (index === "append") {
+            throw new Error(`Cannot ${patch.op} at append position: ${patch.path}`);
+          }
+          next[index] = patch.value;
+        } else if (patch.op === "add") {
+          if (index === "append") {
+            next.push(patch.value);
+          } else {
+            next.splice(index as number, 0, patch.value);
+          }
+        } else if (patch.op === "remove") {
+          if (index === "append") {
+            throw new Error(`Cannot remove at append position: ${patch.path}`);
+          }
+          next.splice(index as number, 1);
+        }
+        return next;
+      } else {
+        if (patch.op === "set" || patch.op === "replace") {
+          return { ...obj, [head]: patch.value };
+        } else if (patch.op === "add") {
+          const val = obj[head];
+          if (Array.isArray(val)) {
+            return { ...obj, [head]: [...val, patch.value] };
+          } else if (val === undefined) {
+            return { ...obj, [head]: [patch.value] };
+          } else {
+            throw new Error(`Cannot add to non-array at path: ${patch.path}`);
+          }
+        } else if (patch.op === "remove") {
+          const next = { ...obj };
+          delete next[head];
+          return next;
+        }
       }
-      const nextSegment = segments[i + 1];
-      const nextIsArrayIndex = parseArrayIndex(nextSegment) !== null;
-      current[key] = nextIsArrayIndex ? [] : {};
     }
-    current = current[key];
-  }
 
-  const finalKey = segments[segments.length - 1];
-
-  const arrayIndex = Array.isArray(current) ? parseArrayIndex(finalKey) : null;
-
-  switch (patch.op) {
-    case "set":
-    case "replace":
-      if (arrayIndex !== null) {
-        if (arrayIndex === "append") {
-          throw new Error(`Cannot ${patch.op} at append position: ${patch.path}`);
-        }
-        (current as unknown[])[arrayIndex] = patch.value;
-      } else {
-        current[finalKey] = patch.value;
+    // Recursive case
+    const currentVal = obj[head];
+    let nextVal;
+    if (currentVal === undefined) {
+      if (patch.op === "remove") {
+        return obj; // Path doesn't exist, nothing to remove
       }
-      break;
-    case "add":
-      if (Array.isArray(current)) {
-        if (arrayIndex === "append") {
-          current.push(patch.value);
-        } else if (typeof arrayIndex === "number") {
-          current.splice(arrayIndex, 0, patch.value);
-        } else {
-          throw new Error(`Invalid array index at path: ${patch.path}`);
-        }
-      } else if (Array.isArray(current[finalKey])) {
-        current[finalKey].push(patch.value);
-      } else if (current[finalKey] === undefined) {
-        current[finalKey] = [patch.value];
-      } else {
-        throw new Error(`Cannot add to non-array at path: ${patch.path}`);
-      }
-      break;
-    case "remove":
-      if (Array.isArray(current)) {
-        if (typeof arrayIndex !== "number") {
-          throw new Error(`Invalid array index at path: ${patch.path}`);
-        }
-        current.splice(arrayIndex, 1);
-      } else {
-        delete current[finalKey];
-      }
-      break;
-  }
+      const nextIsArray = parseArrayIndex(tail[0]) !== null;
+      nextVal = update(nextIsArray ? [] : {}, tail);
+    } else {
+      nextVal = update(currentVal, tail);
+    }
 
-  return clone;
+    if (nextVal === currentVal) {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      const next = [...obj];
+      next[head as any] = nextVal;
+      return next;
+    } else {
+      return { ...obj, [head]: nextVal };
+    }
+  };
+
+  return update(target, segments);
 };
 
 /**
