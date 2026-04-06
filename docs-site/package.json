@@ -9,10 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.1.18",
-    "@ai-sdk/openai": "^3.0.12",
     "@monaco-editor/react": "^4.6.0",
-    "@openrouter/ai-sdk-provider": "^2.0.0",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-scroll-area": "^1.2.0",
     "@radix-ui/react-select": "^2.2.6",
@@ -23,7 +20,6 @@
     "@uischema/core": "file:../packages/uischema-core",
     "@uischema/protocol": "file:../packages/uischema-protocol",
     "@uischema/react": "file:../packages/uischema-react",
-    "ai": "^6.0.41",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
@@ -35,8 +31,7 @@
     "rehype-highlight": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "shiki": "^1.7.0",
-    "tailwind-merge": "^2.5.5",
-    "zod": "^3.24.1"
+    "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
