@@ -160,14 +160,18 @@ async function throttle() {
 async function callOpenRouter(modelId, messages, opts = {}) {
   const { maxTokens = 2000, maxRetries = 2, noSystemRole = false } = opts;
 
-  // Some models (Gemma) don't support the system role — merge it into the first user message
+  // Some models (Gemma) don't support the system role — merge into user message
+  // Important: end with a partial JSON to "steer" the model to continue it
   let effectiveMessages = messages;
   if (noSystemRole) {
     const sysMsg = messages.find(m => m.role === 'system');
     const userMsgs = messages.filter(m => m.role !== 'system');
     if (sysMsg && userMsgs.length > 0) {
       effectiveMessages = [
-        { role: 'user', content: `[Instructions]\n${sysMsg.content}\n\n[Task]\n${userMsgs[0].content}` },
+        {
+          role: 'user',
+          content: `${sysMsg.content}\n\nTask: ${userMsgs[0].content}\n\nRespond with ONLY raw JSON, no markdown fences, no explanation:`,
+        },
         ...userMsgs.slice(1),
       ];
     }
