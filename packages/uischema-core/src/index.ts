@@ -16,3 +16,11 @@ export {
 } from "./validators/zod";
 
 export { validateBasicA11y } from "./validators/basic-a11y";
+
+// Builder API
+export {
+  schema,
+  node,
+  UISchemaNodeBuilder,
+  UISchemaDocumentBuilder,
+} from "./builder";

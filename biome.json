@@ -1,0 +1,67 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false
+  },
+  "files": {
+    "ignore": [
+      "node_modules",
+      "dist",
+      "*.tsbuildinfo",
+      "docs-site/.next",
+      "docs-site/node_modules",
+      "examples/nextjs-vercel-ai-sdk/.next",
+      "examples/nextjs-vercel-ai-sdk/node_modules"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "warn"
+      },
+      "style": {
+        "noVar": "error",
+        "useConst": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noConsoleLog": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "overrides": [
+    {
+      "include": ["packages/uischema-cli/src/commands/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noVar": "off"
+          }
+        }
+      }
+    }
+  ]
+}

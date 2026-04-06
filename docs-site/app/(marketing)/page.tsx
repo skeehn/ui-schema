@@ -13,19 +13,20 @@ import type { UISchemaDocument } from '@uischema/core';
 export default function HomePage() {
   const [generatedSchema, setGeneratedSchema] = useState<UISchemaDocument | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState<string | null>(null);
 
   const handleGenerate = async (prompt: string, model?: string) => {
     if (!prompt.trim()) {
       return;
     }
-    
+
     setIsGenerating(true);
-    setGeneratedSchema(null); // Clear previous schema
-    
+    setGeneratedSchema(null);
+    setGenerationError(null);
+
     try {
       const modelToUse = model || 'qwen3-max';
-      console.log('🚀 Generating with model:', modelToUse, 'Prompt:', prompt);
-      
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -34,26 +35,21 @@ export default function HomePage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('❌ API Error:', errorData);
         throw new Error(errorData.error || `Failed to generate UI (${response.status})`);
       }
 
       const data = await response.json();
-      console.log('✅ Generated schema:', data);
-      
+
       if (!data || !data.root) {
         throw new Error('Invalid response: missing schema data');
       }
-      
+
       setGeneratedSchema(data);
     } catch (error) {
-      console.error('❌ Generation error:', error);
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : 'Failed to generate UI. Please check your API key and try again.';
-      
-      // Show error in a more user-friendly way
-      alert(`Generation failed: ${errorMessage}\n\nCheck the browser console for details.`);
+      setGenerationError(errorMessage);
     } finally {
       setIsGenerating(false);
     }
@@ -61,12 +57,15 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      <HeroSection onGenerate={handleGenerate} isLoading={isGenerating} />
+      <HeroSection
+        onGenerate={handleGenerate}
+        isLoading={isGenerating}
+        error={generationError}
+      />
       <InteractiveDemo initialSchema={generatedSchema || undefined} />
-      {/* Hidden sections - uncomment to show */}
-      {/* <ProcessSection /> */}
-      {/* <CodeExamples /> */}
-      {/* <FeaturesGrid /> */}
+      <ProcessSection />
+      <CodeExamples />
+      <FeaturesGrid />
       <CTASection />
       <Footer />
     </div>

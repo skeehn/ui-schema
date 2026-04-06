@@ -15,6 +15,7 @@ import {
 interface HeroSectionProps {
   onGenerate: (prompt: string, model?: string) => Promise<void>;
   isLoading: boolean;
+  error?: string | null;
 }
 
 const examplePrompts = [
@@ -55,7 +56,7 @@ const AVAILABLE_MODELS = [
   { value: 'llama-3.3-70b', label: 'Llama 3.3 70B' },
 ];
 
-export function HeroSection({ onGenerate, isLoading }: HeroSectionProps) {
+export function HeroSection({ onGenerate, isLoading, error }: HeroSectionProps) {
   const [prompt, setPrompt] = useState('');
   const [selectedModel, setSelectedModel] = useState('qwen3-max'); // Best performing model
 
@@ -122,6 +123,12 @@ export function HeroSection({ onGenerate, isLoading }: HeroSectionProps) {
             </Button>
           </div>
         </form>
+
+        {error && (
+          <div className="max-w-2xl mx-auto mb-3 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+            <span className="font-medium">Generation failed:</span> {error}
+          </div>
+        )}
 
         <p className="text-xs text-muted-foreground text-center">
           Try: {examplePrompts.slice(0, 2).map((example, i) => (

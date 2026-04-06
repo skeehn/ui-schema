@@ -26,6 +26,13 @@ export {
   type UIEvent
 } from "./events";
 
+// Event Bus
+export {
+  UISchemaEventBus,
+  createEventBus,
+  globalBus
+} from "./bus";
+
 // State
 export {
   createWidgetState,

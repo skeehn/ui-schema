@@ -1,0 +1,212 @@
+# UISchema — Machine-Readable Project Spec
+
+> For AI coding agents, LLM tools, and automated tooling.
+
+## What is UISchema?
+
+UISchema is a JSON schema standard + streaming protocol for AI-generated UI components. It is the "intermediate representation" (IR) between an AI language model's text output and rendered React/Vue/DOM components.
+
+**Core value prop**: AI models output UISchema JSON instead of HTML or JSX. This uses 3-5x fewer tokens, is validated against a formal schema, and streams progressively via JSONL patch operations.
+
+## Repository
+
+- GitHub: https://github.com/skeehn/ui-schema
+- npm: @uischema/core, @uischema/react, @uischema/compressed, @uischema/protocol, @uischema/bridges, @uischema/cli
+
+## Package Map
+
+| Package | Path | Purpose |
+|---------|------|---------|
+| @uischema/core | packages/uischema-core/ | Schema types, Zod validators, builder API |
+| @uischema/react | packages/uischema-react/ | React renderer, useUIStream hook, generateUISchema |
+| @uischema/compressed | packages/uischema-compressed/ | CFG shorthand parser (3-5x token reduction) |
+| @uischema/protocol | packages/uischema-protocol/ | JSONL patches, events, UISchemaEventBus |
+| @uischema/bridges | packages/uischema-bridges/ | Open-JSON-UI, AG-UI, MCP Apps bridges |
+| @uischema/cli | packages/uischema-cli/ | CLI: init, validate, preview, generate |
+
+## Key Source Files
+
+- `packages/uischema-core/src/types.ts` — All TypeScript types
+- `packages/uischema-core/src/validators/zod.ts` — Zod schema validators
+- `packages/uischema-core/src/builder.ts` — Fluent builder API
+- `packages/uischema-core/schema/uischema.json` — JSON Schema definition
+- `packages/uischema-react/src/renderer/react.tsx` — React renderer
+- `packages/uischema-react/src/registry/components.ts` — Component registry
+- `packages/uischema-react/src/hooks/useUIStream.ts` — Streaming hook
+- `packages/uischema-react/src/ai/generate.ts` — generateUISchema() helper
+- `packages/uischema-protocol/src/bus.ts` — UISchemaEventBus
+- `packages/uischema-protocol/src/patches.ts` — JSONL patch operations
+- `packages/uischema-protocol/src/events.ts` — Event type definitions
+- `packages/uischema-cli/src/cli.ts` — CLI entry point
+- `docs-site/app/api/generate/route.ts` — Next.js API route for AI generation
+
+## Core Schema Format
+
+```json
+{
+  "schemaVersion": "0.1.0",
+  "root": {
+    "type": "Container",
+    "props": {
+      "ariaLabel": "My UI",
+      "className": "my-container"
+    },
+    "children": [
+      {
+        "type": "Text",
+        "props": { "text": "Hello world" }
+      },
+      {
+        "type": "Button",
+        "props": { "text": "Click", "ariaLabel": "Primary action" },
+        "events": {
+          "onClick": { "type": "action", "name": "handleClick" }
+        }
+      }
+    ]
+  }
+}
+```
+
+## Component Types (23 core + extensible)
+
+Layout: Container, Row, Column, Grid, Card, List, ListItem
+Display: Text, Image, Icon, Badge, Divider, Spacer
+Input: Input, Textarea, Select, Checkbox, RadioGroup, Switch, Slider
+Action: Button, Link, Form
+Custom: x-{anything}, custom:{namespace}:{name}
+
+## Streaming Protocol
+
+UISchema uses JSONL (newline-delimited JSON) for streaming patch operations:
+
+```
+{"op":"set","path":"/root","value":{"type":"Container","props":{"ariaLabel":"Shell"}}}
+{"op":"add","path":"/root/children/-","value":{"type":"Text","props":{"text":"Loading..."}}}
+{"op":"replace","path":"/root/children/0/props/text","value":"Ready!"}
+```
+
+Patch operations: set, add, replace, remove (JSON Pointer paths).
+
+## API Surface
+
+### Rendering
+```tsx
+import { UISchemaRenderer, useUIStream } from '@uischema/react';
+
+// Static rendering
+<UISchemaRenderer schema={doc} onEvent={(name, params) => {}} />
+
+// Streaming
+const { schema, loading } = useUIStream({ endpoint: '/api/generate-ui' });
+```
+
+### Generation
+```ts
+import { generateUISchema } from '@uischema/react/ai';
+const schema = await generateUISchema('A login form', { apiKey: '...' });
+```
+
+### Builder
+```ts
+import { schema, node } from '@uischema/core';
+const ui = schema().root(node('Container').children([...])).build();
+```
+
+### Event Bus
+```ts
+import { createEventBus } from '@uischema/protocol';
+const bus = createEventBus();
+bus.on('ui.update', handler);
+bus.emit({ type: 'ui.update', payload: { node } });
+```
+
+### Validation
+```ts
+import { validateUISchemaDocument, validateBasicA11y } from '@uischema/core';
+const result = validateUISchemaDocument(doc); // { success, data, error }
+const issues = validateBasicA11y(doc.root);   // WCAG preflight
+```
+
+### CLI
+```bash
+npx @uischema/cli init my-project   # Scaffold new project
+npx @uischema/cli validate file.json # Validate schema
+npx @uischema/cli preview           # Start preview server
+npx @uischema/cli generate "prompt" # AI-generate schema
+```
+
+## Event Types
+
+- `ui.update` — AI agent pushes a new/updated UI node
+- `ui.interaction` — User interacted with a component
+- `ui.evaluation` — Accessibility evaluation report
+
+## Environment Variables
+
+```bash
+OPENAI_API_KEY=sk-...         # OpenAI API
+ANTHROPIC_API_KEY=sk-ant-...  # Anthropic API
+OPENROUTER_API_KEY=sk-or-...  # OpenRouter (access all models)
+AI_SDK_MODEL=gpt-4o-mini      # Default model (optional)
+NODE_ENV=development           # Environment
+DEBUG=uischema:*               # Debug logging
+```
+
+## How to Use UISchema (for AI agents)
+
+1. **Install**: `npm install @uischema/core @uischema/react`
+2. **Generate JSON**: Call any LLM with the system prompt in `docs/system-prompt.md`
+3. **Validate**: `validateUISchemaDocument(json)` — returns Zod validation result
+4. **Render**: `<UISchemaRenderer schema={json} onEvent={handler} />`
+5. **Stream**: `useUIStream({ endpoint })` for progressive rendering
+
+## System Prompt for AI Models
+
+To make an AI model generate valid UISchema, use this system prompt:
+
+```
+You are a UI generator. Generate UISchema JSON documents.
+
+UISchema uses these component types:
+- Layout: Container, Row, Column, Grid, Card, List, ListItem
+- Display: Text, Image, Icon, Badge, Divider, Spacer
+- Input: Input, Textarea, Select, Checkbox, RadioGroup, Switch, Slider
+- Action: Button, Link, Form
+
+Rules:
+1. All interactive components (Button, Input, etc.) MUST have ariaLabel in props
+2. schemaVersion must be "0.1.0"
+3. root is the top-level UISchemaNode
+4. children is an array of UISchemaNode
+5. events map event names to { type, name, params? }
+6. Return valid JSON only
+
+Output format:
+{
+  "schemaVersion": "0.1.0",
+  "root": { "type": "...", "props": {...}, "children": [...] }
+}
+```
+
+## Bridges
+
+- **Open-JSON-UI**: `import { fromOpenJSONUI, toOpenJSONUI } from '@uischema/bridges'`
+- **AG-UI**: `import { toAGUIEvent, fromAGUIEvent } from '@uischema/bridges'`
+- **MCP Apps**: `import { createMCPAppsUpdateMessage } from '@uischema/bridges'`
+
+## Testing
+
+```bash
+npm run build           # Build all packages
+npm run type-check      # TypeScript check
+npm run lint            # Biome lint
+npm run test:unit       # Vitest unit tests
+npm run test:openai     # OpenAI integration (needs OPENAI_API_KEY)
+npm run test:anthropic  # Anthropic integration (needs ANTHROPIC_API_KEY)
+```
+
+## License
+
+MIT — open source, contributions welcome.
+https://github.com/skeehn/ui-schema
