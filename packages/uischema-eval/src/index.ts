@@ -33,8 +33,9 @@ export class WCAGEngine {
     const issues: EvaluationIssue[] = [];
 
     const walk = (n: UISchemaNode, path: string) => {
-      // 1.1.1 Non-text Content (simplified)
-      if (n.type === "Image" && !n.props?.alt && !n.props?.ariaLabel && !n.props?.src) {
+      // 1.1.1 Non-text Content: images with a src but no alt/ariaLabel are the violation.
+      // src is irrelevant to whether the image is described — omitting it from the condition was a bug.
+      if (n.type === "Image" && !n.props?.alt && !n.props?.ariaLabel) {
         issues.push({
           criterion: "1.1.1",
           level: "A",
