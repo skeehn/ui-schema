@@ -23,7 +23,7 @@ const renderNode = (node: UISchemaNode, onEvent?: UISchemaComponentProps["onEven
   const Component = getComponent(node.type) ?? FallbackComponent;
 
   const childElements = (node.children ?? []).map((child, index) => (
-    <React.Fragment key={child.key ?? child.id ?? index}>
+    <React.Fragment key={child.key ?? child.id ?? `${child.type}:${index}`}>
       {renderNode(child, onEvent)}
     </React.Fragment>
   ));
@@ -31,7 +31,7 @@ const renderNode = (node: UISchemaNode, onEvent?: UISchemaComponentProps["onEven
   const slotElements = Object.entries(node.slots ?? {}).flatMap(([slotName, slotValue]) => {
     const slotNodes = Array.isArray(slotValue) ? slotValue : [slotValue];
     return slotNodes.map((slotNode, index) => (
-      <React.Fragment key={`${slotName}-${slotNode.key ?? slotNode.id ?? index}`}>
+      <React.Fragment key={`${slotName}:${slotNode.key ?? slotNode.id ?? `${slotNode.type}:${index}`}`}>
         {renderNode(slotNode, onEvent)}
       </React.Fragment>
     ));

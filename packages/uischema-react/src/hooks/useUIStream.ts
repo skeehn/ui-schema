@@ -116,13 +116,19 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
         }
       }
 
-      // Process remaining buffer
+      // Process remaining buffer — incomplete JSON at end-of-stream is expected and ignored
       if (buffer.trim()) {
         try {
           const patches = parseJSONLPatches(buffer);
           applyPatchesToSchema(patches);
         } catch (error) {
-          // Ignore incomplete JSON at end
+          const isLikelyTruncated =
+            error instanceof SyntaxError ||
+            (error instanceof Error && error.message.toLowerCase().includes("json"));
+          if (!isLikelyTruncated) {
+            const err = error instanceof Error ? error : new Error(String(error));
+            onError?.(err);
+          }
         }
       }
 

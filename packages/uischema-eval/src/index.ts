@@ -97,7 +97,13 @@ export class WCAGEngine {
     const issues: EvaluationIssue[] = [];
     const elements = this.adapter.queryAll("*");
 
+    let focusVisibleFlagged = false;
+    let contrastFlagged = false;
+
     for (const el of elements) {
+      // Skip hidden elements — they don't affect the rendered experience
+      if (el.hidden || el.getAttribute("aria-hidden") === "true") continue;
+
       // 4.1.2 Name, Role, Value
       const name = this.adapter.getComputedName(el);
 
@@ -111,28 +117,26 @@ export class WCAGEngine {
         });
       }
 
-      // 2.4.7 Focus Visible (Manual check required for automated tools usually)
-      if (this.adapter.isFocusable(el)) {
+      // 2.4.7 Focus Visible — emit one summary issue instead of one per element
+      if (!focusVisibleFlagged && this.adapter.isFocusable(el)) {
         issues.push({
           criterion: "2.4.7",
           level: "AA",
           status: "MANUAL_REQUIRED",
-          message: "Verify that focus indicator is visible.",
-          element: el
+          message: "Verify that focus indicators are visible for all interactive elements."
         });
+        focusVisibleFlagged = true;
       }
 
-      // 1.4.3 Contrast (Minimum)
-      if (el.innerText && el.innerText.trim().length > 0) {
-        // In a full engine, we'd check computed colors here.
-        // For the MVP, we flag for manual review.
+      // 1.4.3 Contrast — emit one summary issue instead of one per text node
+      if (!contrastFlagged && el.innerText && el.innerText.trim().length > 0) {
         issues.push({
           criterion: "1.4.3",
           level: "AA",
           status: "MANUAL_REQUIRED",
-          message: `Verify text contrast for: "${el.innerText.substring(0, 20)}..."`,
-          element: el
+          message: "Verify text contrast meets WCAG AA (4.5:1) for all visible text."
         });
+        contrastFlagged = true;
       }
     }
 

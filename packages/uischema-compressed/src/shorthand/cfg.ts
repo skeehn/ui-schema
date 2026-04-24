@@ -25,7 +25,7 @@ const parseBracketContent = (input: string, start: number) => {
     }
   }
   if (depth !== 0) {
-    throw new Error("Unmatched bracket in shorthand.");
+    throw new Error(`Unmatched bracket in shorthand at position ${start}: "${input.slice(start, start + 20)}"`);
   }
   return { content: input.slice(start + 1, i), next: i + 1 };
 };
@@ -73,7 +73,8 @@ export const parseShorthand = (input: string): ShorthandNode => {
   let index = 0;
   const { value: type, next } = parseIdentifier(trimmed, index);
   if (!type) {
-    throw new Error("Expected component identifier at start of shorthand.");
+    const preview = trimmed.length > 20 ? `"${trimmed.slice(0, 20)}..."` : `"${trimmed}"`;
+    throw new Error(`Expected component identifier at start of shorthand, got ${preview}`);
   }
   index = next;
 
