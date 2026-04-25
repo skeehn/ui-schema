@@ -50,9 +50,17 @@ export type MCPAppsUIResource = {
  * For now, generates a simple HTML wrapper that can render UISchema
  * Future: Direct UISchema rendering in MCP Apps
  */
-export const toMCPAppsHTML = (doc: UISchemaDocument, resourceUri: string): string => {
-  const schemaJson = JSON.stringify(doc, null, 2);
-  const escapedSchema = schemaJson.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+export const toMCPAppsHTML = (
+  doc: UISchemaDocument,
+  resourceUri: string,
+  allowedOrigin = "*"
+): string => {
+  // Embed JSON in a typed script element so it's never parsed as JS.
+  // Only </script> needs escaping to prevent early tag closure.
+  const schemaJson = JSON.stringify(doc, null, 2).replace(/<\/script>/gi, "<\\/script>");
+  // allowedOrigin goes into a <script type="module"> block, so it needs the
+  // same </script> escaping — JSON.stringify alone is not sufficient.
+  const safeOrigin = JSON.stringify(allowedOrigin).replace(/<\/script>/gi, "<\\/script>");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -60,17 +68,27 @@ export const toMCPAppsHTML = (doc: UISchemaDocument, resourceUri: string): strin
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UISchema App</title>
+  <script type="application/json" id="__uischema__">
+${schemaJson}
+  </script>
   <script type="module">
+    // Restrict postMessage to the known parent origin when available.
+    const _allowedOrigin = ${safeOrigin};
+    const _parentOrigin = _allowedOrigin !== '*'
+      ? _allowedOrigin
+      : (document.referrer ? new URL(document.referrer).origin : '*');
+
     // MCP Apps initialization
     let nextId = 1;
     function sendRequest(method, params) {
       const id = nextId++;
-      window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, '*');
+      window.parent.postMessage({ jsonrpc: "2.0", id, method, params }, _parentOrigin);
       return new Promise((resolve, reject) => {
         const listener = (event) => {
+          if (_parentOrigin !== '*' && event.origin !== _parentOrigin) return;
           if (event.data?.id === id) {
             window.removeEventListener('message', listener);
-            if (event.data?.result) {
+            if (event.data?.result !== undefined) {
               resolve(event.data.result);
             } else if (event.data?.error) {
               reject(new Error(event.data.error.message));
@@ -96,10 +114,14 @@ export const toMCPAppsHTML = (doc: UISchemaDocument, resourceUri: string): strin
     })();
 
     // UISchema rendering (simplified - would use actual renderer in production)
-    const schema = ${escapedSchema};
+    // Use textContent — never innerHTML — so schema string values can't be
+    // parsed as HTML and execute arbitrary scripts.
+    const schema = JSON.parse(document.getElementById('__uischema__').textContent);
     const root = document.getElementById('root');
     if (root && schema.root) {
-      root.innerHTML = '<pre>' + JSON.stringify(schema.root, null, 2) + '</pre>';
+      const pre = document.createElement('pre');
+      pre.textContent = JSON.stringify(schema.root, null, 2);
+      root.appendChild(pre);
     }
   </script>
 </head>

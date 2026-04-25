@@ -105,13 +105,15 @@ export const fromOpenJSONUIDocument = (doc: OpenJSONUIDocument): UISchemaDocumen
   };
 };
 
+const REVERSE_TYPE_MAP: Record<string, string> = Object.fromEntries(
+  Object.entries(TYPE_MAP).map(([k, v]) => [v, k])
+);
+
 /**
  * Convert UISchema node to Open-JSON-UI component
  */
 export const toOpenJSONUI = (node: UISchemaNode): OpenJSONUIComponent => {
-  const reverseTypeMap: Record<string, string> = Object.fromEntries(
-    Object.entries(TYPE_MAP).map(([k, v]) => [v, k])
-  );
+  const reverseTypeMap = REVERSE_TYPE_MAP;
 
   const openType = reverseTypeMap[node.type] ?? node.type.replace(/^custom:/, "");
 

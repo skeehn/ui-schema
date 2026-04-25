@@ -133,13 +133,26 @@ export const serializeEvent = (event: UIEvent): string => {
  * Deserialize event from JSON
  */
 export const deserializeEvent = (json: string): UIEvent => {
-  const parsed = JSON.parse(json);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch (cause) {
+    throw new Error(
+      `Failed to parse UIEvent JSON: ${cause instanceof Error ? cause.message : String(cause)}`
+    );
+  }
   if (
-    parsed.type === "ui.update" ||
-    parsed.type === "ui.interaction" ||
-    parsed.type === "ui.evaluation"
+    typeof parsed === "object" &&
+    parsed !== null &&
+    "type" in parsed &&
+    (parsed.type === "ui.update" ||
+      parsed.type === "ui.interaction" ||
+      parsed.type === "ui.evaluation")
   ) {
     return parsed as UIEvent;
   }
-  throw new Error(`Invalid event type: ${parsed.type}`);
+  const type = typeof parsed === "object" && parsed !== null && "type" in parsed
+    ? String((parsed as Record<string, unknown>).type)
+    : typeof parsed;
+  throw new Error(`Invalid event type: "${type}". Expected one of: ui.update, ui.interaction, ui.evaluation`);
 };
