@@ -17,7 +17,9 @@ const ALLOWED_PROPS = new Set([
   "required",
   "readOnly",
   "name",
-  "label",
+  // "label" is intentionally excluded: it's a UISchema-level prop consumed by
+  // component wrappers (e.g. to render a <label> element) and must not be
+  // forwarded to the underlying DOM node, where it is not a valid attribute.
 ]);
 
 const DANGEROUS_PROPS = new Set([

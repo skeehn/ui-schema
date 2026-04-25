@@ -58,6 +58,9 @@ export const toMCPAppsHTML = (
   // Embed JSON in a typed script element so it's never parsed as JS.
   // Only </script> needs escaping to prevent early tag closure.
   const schemaJson = JSON.stringify(doc, null, 2).replace(/<\/script>/gi, "<\\/script>");
+  // allowedOrigin goes into a <script type="module"> block, so it needs the
+  // same </script> escaping — JSON.stringify alone is not sufficient.
+  const safeOrigin = JSON.stringify(allowedOrigin).replace(/<\/script>/gi, "<\\/script>");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -70,7 +73,7 @@ ${schemaJson}
   </script>
   <script type="module">
     // Restrict postMessage to the known parent origin when available.
-    const _allowedOrigin = ${JSON.stringify(allowedOrigin)};
+    const _allowedOrigin = ${safeOrigin};
     const _parentOrigin = _allowedOrigin !== '*'
       ? _allowedOrigin
       : (document.referrer ? new URL(document.referrer).origin : '*');
@@ -111,10 +114,14 @@ ${schemaJson}
     })();
 
     // UISchema rendering (simplified - would use actual renderer in production)
+    // Use textContent — never innerHTML — so schema string values can't be
+    // parsed as HTML and execute arbitrary scripts.
     const schema = JSON.parse(document.getElementById('__uischema__').textContent);
     const root = document.getElementById('root');
     if (root && schema.root) {
-      root.innerHTML = '<pre>' + JSON.stringify(schema.root, null, 2) + '</pre>';
+      const pre = document.createElement('pre');
+      pre.textContent = JSON.stringify(schema.root, null, 2);
+      root.appendChild(pre);
     }
   </script>
 </head>
