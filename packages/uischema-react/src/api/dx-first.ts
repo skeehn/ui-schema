@@ -1,7 +1,7 @@
 import React from "react";
 import { UISchemaRenderer as BaseUISchemaRenderer, type UISchemaRendererProps } from "../renderer/react";
 import { useUIStream } from "../hooks/useUIStream";
-import type { UISchemaDocument, UISchemaNode } from "@uischema/core";
+import type { UISchemaNode } from "@uischema/core";
 
 /**
  * DX-First API: Simple drop-in component (re-exported for convenience)
@@ -10,34 +10,16 @@ import type { UISchemaDocument, UISchemaNode } from "@uischema/core";
 export const UISchemaRenderer = BaseUISchemaRenderer;
 
 /**
- * DX-First API: Simple generation hook
- * For now, returns a placeholder - in production would call LLM
+ * DX-First API: AI generation, re-exported from @uischema/ai.
+ * Works with any OpenAI-compatible endpoint (baseURL/apiKey/model) or any
+ * LLM SDK via the generateText option. See @uischema/ai for details.
  */
-export const generateUISchema = async (
-  prompt: string
-): Promise<UISchemaDocument> => {
-  // Placeholder implementation
-  // In production, this would call an LLM with structured output
-  return {
-    schemaVersion: "0.1.0",
-    root: {
-      type: "Container",
-      props: {
-        ariaLabel: "Generated UI",
-        text: `Generated from: ${prompt}`
-      },
-      children: [
-        {
-          type: "Text",
-          props: {
-            text: prompt,
-            ariaLabel: "Generated text"
-          }
-        }
-      ]
-    }
-  };
-};
+export {
+  generateUISchema,
+  type GenerateTextFn,
+  type GenerateUISchemaOptions,
+  type GenerateUISchemaResult
+} from "@uischema/ai";
 
 /**
  * DX-First API: Streaming UI component with useUIStream

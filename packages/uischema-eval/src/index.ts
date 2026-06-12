@@ -1,5 +1,5 @@
 import type { UISchemaNode } from "@uischema/core";
-import type { DOMAdapter } from "@uischema/dom";
+import { getVisibleText, type DOMAdapter } from "@uischema/dom";
 
 export type EvaluationLevel = "A" | "AA" | "AAA";
 export type EvaluationResult = "PASS" | "FAIL" | "WARNING" | "MANUAL_REQUIRED";
@@ -130,7 +130,8 @@ export class WCAGEngine {
       }
 
       // 1.4.3 Contrast — emit one summary issue instead of one per text node
-      if (!contrastFlagged && el.innerText && el.innerText.trim().length > 0) {
+      const visibleText = getVisibleText(el);
+      if (!contrastFlagged && visibleText.trim().length > 0) {
         issues.push({
           criterion: "1.4.3",
           level: "AA",

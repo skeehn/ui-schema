@@ -1,4 +1,5 @@
 export { UISchemaRenderer, renderUISchema } from "./renderer/react";
+export { normalizeProps } from "./utils/props";
 
 export {
   registerComponent,

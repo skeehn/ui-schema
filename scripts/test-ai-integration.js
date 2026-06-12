@@ -315,6 +315,6 @@ if (failed > 0) {
   process.exit(1);
 } else {
   log("\n🎉 All AI integration tests passed!", "green");
-  log("\n💡 Next: Test with real AI (see TESTING_WITH_AI.md)", "blue");
+  log("\n💡 Next: Test with real AI (see docs/testing.md)", "blue");
   process.exit(0);
 }

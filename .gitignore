@@ -8,6 +8,13 @@ dist/
 build/
 *.tsbuildinfo
 
+# Compiled artifacts emitted next to TypeScript sources.
+# Bare *.d.ts is deliberately not ignored: authored ambient declarations
+# may legitimately live under src/.
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts.map
+
 # Environment variables
 .env
 .env.local

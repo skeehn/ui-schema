@@ -1,14 +1,35 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/uischema-core" },
-    { "path": "packages/uischema-compressed" },
-    { "path": "packages/uischema-bridges" },
-    { "path": "packages/uischema-protocol" },
-    { "path": "packages/uischema-react" },
-    { "path": "packages/uischema-dom" },
-    { "path": "packages/uischema-eval" },
-    { "path": "packages/uischema-vue" },
-    { "path": "packages/uischema-cli" }
+    {
+      "path": "packages/uischema-core"
+    },
+    {
+      "path": "packages/uischema-ai"
+    },
+    {
+      "path": "packages/uischema-compressed"
+    },
+    {
+      "path": "packages/uischema-bridges"
+    },
+    {
+      "path": "packages/uischema-protocol"
+    },
+    {
+      "path": "packages/uischema-react"
+    },
+    {
+      "path": "packages/uischema-dom"
+    },
+    {
+      "path": "packages/uischema-eval"
+    },
+    {
+      "path": "packages/uischema-vue"
+    },
+    {
+      "path": "packages/uischema-cli"
+    }
   ]
 }

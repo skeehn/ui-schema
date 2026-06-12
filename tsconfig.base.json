@@ -15,6 +15,9 @@
       "@uischema/core": [
         "packages/uischema-core/src/index.ts"
       ],
+      "@uischema/ai": [
+        "packages/uischema-ai/src/index.ts"
+      ],
       "@uischema/compressed": [
         "packages/uischema-compressed/src/index.ts"
       ],
