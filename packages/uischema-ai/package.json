@@ -1,12 +1,13 @@
 {
-  "name": "@uischema/cli",
+  "name": "@uischema/ai",
   "version": "0.1.0",
+  "description": "Provider-agnostic AI generation for UISchema: works with any OpenAI-compatible endpoint or any LLM SDK via bring-your-own-call.",
   "license": "MIT",
-  "bin": {
-    "uischema": "./dist/cli.js"
-  },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,8 +19,7 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "@uischema/core": "*",
-    "@uischema/react": "*"
+    "@uischema/core": "*"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

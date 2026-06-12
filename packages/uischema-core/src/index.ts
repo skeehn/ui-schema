@@ -16,3 +16,4 @@ export {
 } from "./validators/zod";
 
 export { validateBasicA11y } from "./validators/basic-a11y";
+export type { A11yIssue } from "./validators/basic-a11y";

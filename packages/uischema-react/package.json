@@ -1,7 +1,7 @@
 {
   "name": "@uischema/react",
   "version": "0.1.0",
-  "private": true,
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@uischema/core": "*",
-    "@uischema/protocol": "*"
+    "@uischema/protocol": "*",
+    "@uischema/ai": "*"
   },
   "peerDependencies": {
     "react": ">=18"

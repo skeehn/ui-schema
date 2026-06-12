@@ -9,10 +9,14 @@ const path = require("node:path");
 
 const packages = [
   "uischema-core",
+  "uischema-ai",
   "uischema-compressed",
   "uischema-bridges",
   "uischema-protocol",
   "uischema-react",
+  "uischema-vue",
+  "uischema-dom",
+  "uischema-eval",
   "uischema-cli"
 ];
 

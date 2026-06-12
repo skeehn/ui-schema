@@ -17,6 +17,7 @@ This runs:
 
 1. **Unit tests** (`npm run test:unit`) — `node --test` suite in [`tests/`](../tests) covering every package:
    - `tests/core.test.js` — Zod schema validation and basic accessibility checks
+   - `tests/ai.test.js` — `@uischema/ai` generation: response parsing/repair, OpenAI-compatible calls (mocked), bring-your-own-model mode
    - `tests/compressed.test.js` — shorthand parsing, expansion, coarse-to-fine pipeline
    - `tests/protocol.test.js` — JSON Pointer patches, JSONL streaming, events, widget state
    - `tests/bridges.test.js` — Open-JSON-UI round-trips, AG-UI events, MCP Apps HTML escaping

@@ -28,6 +28,7 @@ That's it! You're ready to use UISchema in your projects.
 - ✅ **Standards-Aligned**: Profiles/extensions of Open-JSON-UI, AG-UI, MCP Apps (not competing)
 - ✅ **Token-Efficient**: 3-5x token reduction via compressed CFG shorthand
 - ✅ **DX-First API**: `<UISchemaRenderer />` + `generateUISchema(prompt)` - <5min hello world
+- ✅ **Any AI Backend**: `@uischema/ai` works with any OpenAI-compatible API or any LLM SDK (Anthropic, Vercel AI SDK, …)
 - ✅ **Small Primitives**: Minimal set (Layout/Input/Display/Action) with extension hooks
 - ✅ **Basic Accessibility**: Schema-level constraints + optional axe-core integration
 - ✅ **React Adapter**: Full RSC support, streaming via `useUIStream` hook
@@ -86,13 +87,67 @@ Create `uischema.json`:
 
 See [Getting Started Guide](./docs/getting-started.md) for detailed instructions.
 
+## Generate UI with Any AI Backend
+
+`@uischema/ai` turns a natural-language prompt into a validated, render-ready UISchema document. It has no provider SDK dependencies and works two ways:
+
+**1. Any OpenAI-compatible endpoint** — OpenAI, Groq, Together, OpenRouter, Ollama, vLLM, or your own gateway:
+
+```ts
+import { generateUISchema } from "@uischema/ai";
+
+const { document, a11yIssues } = await generateUISchema(
+  "A newsletter signup card with an email input and a subscribe button",
+  {
+    baseURL: "https://api.groq.com/openai/v1", // or api.openai.com/v1, localhost:11434/v1, …
+    apiKey: process.env.GROQ_API_KEY,
+    model: "llama-3.1-8b-instant"
+  }
+);
+```
+
+**2. Bring your own model call** — plug in the Anthropic SDK, Vercel AI SDK, LangChain, or anything else:
+
+```ts
+import Anthropic from "@anthropic-ai/sdk";
+import { generateUISchema } from "@uischema/ai";
+
+const anthropic = new Anthropic();
+
+const { document } = await generateUISchema("A settings form with a dark-mode switch", {
+  generateText: async ({ system, prompt }) => {
+    const message = await anthropic.messages.create({
+      model: "claude-opus-4-8",
+      max_tokens: 4096,
+      system,
+      messages: [{ role: "user", content: prompt }]
+    });
+    const block = message.content.find((b) => b.type === "text");
+    return block ? block.text : "";
+  }
+});
+```
+
+Every result is schema-validated (Zod) and accessibility-checked before you render it. Malformed model output is auto-repaired: fences and prose are stripped, trailing commas tolerated, and validation errors are sent back to the model for a retry (`repair` option). For providers with structured outputs, `uischemaJsonSchema` exports the JSON Schema to pass as a response format or tool definition.
+
+Then render the result with any adapter:
+
+```tsx
+import { UISchemaRenderer } from "@uischema/react"; // or @uischema/vue
+<UISchemaRenderer schema={document} />
+```
+
 ## Packages
 
 - `@uischema/core` - Schema definition, validators, TypeScript types
+- `@uischema/ai` - Provider-agnostic AI generation (any OpenAI-compatible API or any SDK)
 - `@uischema/compressed` - CFG shorthand, expansion, coarse-to-fine pipeline
 - `@uischema/bridges` - Open-JSON-UI, AG-UI, MCP Apps bridges
 - `@uischema/protocol` - Minimal protocol (patches, events, state)
 - `@uischema/react` - React adapter with DX-first API
+- `@uischema/vue` - Vue 3 adapter
+- `@uischema/dom` - Framework-agnostic DOM adapter (browsers + jsdom)
+- `@uischema/eval` - WCAG accessibility engine (schema preflight + DOM audit)
 - `@uischema/cli` - Validation CLI, preview server, type generation
 
 ## Architecture

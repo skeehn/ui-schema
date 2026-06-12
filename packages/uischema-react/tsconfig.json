@@ -10,7 +10,14 @@
     "src"
   ],
   "references": [
-    { "path": "../uischema-core" },
-    { "path": "../uischema-protocol" }
+    {
+      "path": "../uischema-core"
+    },
+    {
+      "path": "../uischema-protocol"
+    },
+    {
+      "path": "../uischema-ai"
+    }
   ]
 }
