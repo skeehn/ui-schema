@@ -130,7 +130,9 @@ export class WCAGEngine {
       }
 
       // 1.4.3 Contrast — emit one summary issue instead of one per text node
-      if (!contrastFlagged && el.innerText && el.innerText.trim().length > 0) {
+      // (innerText is undefined in jsdom, so fall back to textContent)
+      const visibleText = el.innerText ?? el.textContent ?? "";
+      if (!contrastFlagged && visibleText.trim().length > 0) {
         issues.push({
           criterion: "1.4.3",
           level: "AA",

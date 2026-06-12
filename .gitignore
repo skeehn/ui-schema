@@ -8,6 +8,12 @@ dist/
 build/
 *.tsbuildinfo
 
+# Compiled artifacts emitted next to TypeScript sources
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.d.ts.map
+
 # Environment variables
 .env
 .env.local

@@ -10,6 +10,13 @@ export interface DOMAdapter {
 }
 
 /**
+ * Returns an element's rendered text, working in both browsers and jsdom
+ * (which does not implement innerText).
+ */
+export const getVisibleText = (element: HTMLElement): string =>
+  element.innerText ?? element.textContent ?? "";
+
+/**
  * WebDOMAdapter provides a framework-agnostic abstraction over the DOM.
  * It can be used in browsers or with jsdom.
  */
@@ -72,6 +79,8 @@ export class WebDOMAdapter implements DOMAdapter {
 
   /**
    * Simplified accessible name computation.
+   * Falls back from innerText to textContent because jsdom does not
+   * implement innerText.
    */
   getComputedName(element: HTMLElement): string {
     const ariaLabel = element.getAttribute("aria-label");
@@ -81,7 +90,7 @@ export class WebDOMAdapter implements DOMAdapter {
     if (ariaLabelledBy) {
       const doc = element.ownerDocument;
       const labelElement = doc.getElementById(ariaLabelledBy);
-      if (labelElement) return (labelElement as HTMLElement).innerText;
+      if (labelElement) return getVisibleText(labelElement as HTMLElement);
     }
 
     const tag = element.tagName.toLowerCase();
@@ -90,7 +99,7 @@ export class WebDOMAdapter implements DOMAdapter {
       if (placeholder) return placeholder;
     }
 
-    return (element as HTMLElement).innerText || element.getAttribute("title") || "";
+    return getVisibleText(element) || element.getAttribute("title") || "";
   }
 
   isFocusable(element: HTMLElement): boolean {

@@ -8,8 +8,8 @@ Get started in minutes:
 
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd uischema
+git clone https://github.com/skeehn/ui-schema.git
+cd ui-schema
 
 # Install dependencies
 npm install
@@ -130,7 +130,7 @@ See [Architecture Guide](./docs/architecture.md) for detailed information.
 
 ### Getting Started
 - [Getting Started Guide](./docs/getting-started.md) - Step-by-step setup and first project
-- [Quick Start](./QUICK_START.md) - Fast track to running examples
+- [Testing Guide](./docs/testing.md) - Running the unit, smoke, and AI integration tests
 
 ### Core Concepts
 - [API Reference](./docs/api-reference.md) - Complete API documentation with examples
@@ -167,14 +167,14 @@ npm install
 # Build all packages
 npm run build
 
-# Run tests
+# Run unit + smoke tests (see docs/testing.md for the full matrix)
 npm test
 
-# Validate schema
-npx @uischema/cli validate examples/hello-world/uischema.json
+# Validate schema (use node directly inside the monorepo)
+node packages/uischema-cli/dist/cli.js validate examples/hello-world/uischema.json
 
 # Start preview server
-npx @uischema/cli preview
+node packages/uischema-cli/dist/cli.js preview
 ```
 
 ## Roadmap
@@ -195,10 +195,6 @@ npx @uischema/cli preview
 - Full evaluation suite
 - Full protocol layer
 - Additional framework adapters
-
-## License
-
-MIT
 
 ## Contributing
 

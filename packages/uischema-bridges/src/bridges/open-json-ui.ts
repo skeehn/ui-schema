@@ -48,12 +48,14 @@ export const fromOpenJSONUI = (component: OpenJSONUIComponent): UISchemaNode => 
     ...(component.properties ?? {})
   };
 
-  // Map common properties
+  // Map common properties (label wins over title when both are present)
   if (component.properties?.title) {
     props.text = component.properties.title;
+    delete props.title;
   }
   if (component.properties?.label) {
     props.text = component.properties.label;
+    delete props.label;
   }
   if (component.properties?.href) {
     props.href = component.properties.href as string;
@@ -121,10 +123,8 @@ export const toOpenJSONUI = (node: UISchemaNode): OpenJSONUIComponent => {
     ...(node.props ?? {})
   };
 
-  // Extract style if present
-  if (properties.style) {
-    // Style will be handled separately
-  }
+  // Style is emitted on the component's top-level `style` field, not in properties
+  delete properties.style;
 
   // Map text to title/label based on component type
   if (properties.text) {

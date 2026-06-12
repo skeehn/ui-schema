@@ -34,6 +34,11 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Keep callbacks in refs so unstable (inline) callback identities don't
+  // invalidate streamFromEndpoint and re-trigger the auto-stream effect.
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+
   // Apply patches to current schema
   const applyPatchesToSchema = useCallback((patches: PatchOperation[]) => {
     setState((prev) => {
@@ -49,14 +54,14 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
         };
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
-        onError?.(err);
+        onErrorRef.current?.(err);
         return {
           ...prev,
           error: err
         };
       }
     });
-  }, [onError]);
+  }, []);
 
   // Stream from endpoint
   const streamFromEndpoint = useCallback(async () => {
@@ -65,6 +70,9 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
     }
 
     setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    // Abort any in-flight request before starting a new one
+    abortControllerRef.current?.abort();
 
     // Create abort controller if not provided
     const controller = abortSignal
@@ -110,7 +118,7 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
             applyPatchesToSchema(patches);
           } catch (error) {
             const err = error instanceof Error ? error : new Error(String(error));
-            onError?.(err);
+            onErrorRef.current?.(err);
             setState((prev) => ({ ...prev, error: err }));
           }
         }
@@ -127,7 +135,7 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
             (error instanceof Error && error.message.toLowerCase().includes("json"));
           if (!isLikelyTruncated) {
             const err = error instanceof Error ? error : new Error(String(error));
-            onError?.(err);
+            onErrorRef.current?.(err);
           }
         }
       }
@@ -139,10 +147,10 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
         return;
       }
       const err = error instanceof Error ? error : new Error(String(error));
-      onError?.(err);
+      onErrorRef.current?.(err);
       setState((prev) => ({ ...prev, loading: false, error: err }));
     }
-  }, [endpoint, abortSignal, applyPatchesToSchema, onError]);
+  }, [endpoint, abortSignal, applyPatchesToSchema]);
 
   // Apply patches manually
   const applyPatches = useCallback((patches: PatchOperation[]) => {

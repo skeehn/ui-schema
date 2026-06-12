@@ -33,7 +33,8 @@ const parseBracketContent = (input: string, start: number) => {
 const parseProps = (content: string) => {
   const props: Record<string, string> = {};
   if (!content.trim()) return props;
-  const segments = content.split(";").map((segment) => segment.trim()).filter(Boolean);
+  // Split on ";" only at bracket depth 0 so values may contain nested brackets
+  const segments = splitTopLevel(content, ";");
   segments.forEach((segment) => {
     const [rawKey, ...rest] = segment.split(":");
     const key = rawKey?.trim();

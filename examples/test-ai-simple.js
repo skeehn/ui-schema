@@ -102,6 +102,6 @@ console.log('✅ AI-generated schema rendered\n');
 
 console.log('🎉 All AI integration tests passed!');
 console.log('\n💡 Next steps:');
-console.log('   - Test with real AI: See TESTING_WITH_AI.md');
+console.log('   - Test with real AI: See docs/testing.md');
 console.log('   - Try OpenAI: npm install openai');
 console.log('   - Try Vercel AI SDK: npm install ai @ai-sdk/openai');
