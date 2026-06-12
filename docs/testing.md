@@ -46,12 +46,12 @@ cp .env.example .env   # then add your key(s)
 
 | Command | Provider / key |
 | --- | --- |
-| `npm run test:ai` | Groq (`GROQ_API_KEY`) — generation pipeline suite |
-| `npm run test:ai:simple` | Groq (`GROQ_API_KEY`) — single quick scenario |
+| `npm run test:ai` | Local mock suite — no API key required |
+| `npm run test:ai:simple` | Local mock suite — no API key required |
 | `npm run test:ai:live` | Groq (`GROQ_API_KEY`) — 10 live scenarios: generate → validate → patch → render → bridge |
 | `npm run test:openai` | OpenAI (`OPENAI_API_KEY`) |
 | `npm run test:vercel-ai` | OpenAI via Vercel AI SDK (`OPENAI_API_KEY`) |
-| `npm run test:everything` | Runs everything, skipping AI tests when keys are missing |
+| `npm run test:everything` | Runs everything, skipping live AI tests when keys are missing |
 
 Never commit `.env` — it is gitignored.
 

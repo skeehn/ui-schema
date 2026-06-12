@@ -74,17 +74,22 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
     // Abort any in-flight request before starting a new one
     abortControllerRef.current?.abort();
 
-    // Create abort controller if not provided
-    const controller = abortSignal
-      ? undefined
-      : new AbortController();
-    if (controller) {
-      abortControllerRef.current = controller;
+    // Always use an internal controller so repeated stream() calls cancel the
+    // prior request; an external abortSignal is forwarded to it.
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const onExternalAbort = () => controller.abort();
+    if (abortSignal) {
+      if (abortSignal.aborted) {
+        controller.abort();
+      } else {
+        abortSignal.addEventListener("abort", onExternalAbort);
+      }
     }
 
     try {
       const response = await fetch(endpoint, {
-        signal: abortSignal ?? controller?.signal,
+        signal: controller.signal,
         headers: {
           Accept: "application/x-ndjson, application/json"
         }
@@ -149,6 +154,8 @@ export const useUIStream = (options: UIStreamOptions = {}) => {
       const err = error instanceof Error ? error : new Error(String(error));
       onErrorRef.current?.(err);
       setState((prev) => ({ ...prev, loading: false, error: err }));
+    } finally {
+      abortSignal?.removeEventListener("abort", onExternalAbort);
     }
   }, [endpoint, abortSignal, applyPatchesToSchema]);
 
