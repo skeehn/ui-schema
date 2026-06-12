@@ -19,6 +19,7 @@
     "test:all": "node scripts/test-all.js",
     "test:ai": "node scripts/test-ai-integration.js",
     "test:ai:simple": "node examples/test-ai-simple.js",
+    "test:ai:live": "node scripts/test-claude-scenarios.js",
     "test:core": "node -e \"require('@uischema/core'); console.log('✅ Core package loaded')\"",
     "test:compressed": "node -e \"require('@uischema/compressed'); console.log('✅ Compressed package loaded')\"",
     "test:bridges": "node -e \"require('@uischema/bridges'); console.log('✅ Bridges package loaded')\"",
