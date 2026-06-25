@@ -2,6 +2,8 @@
 
 UISchema is a formal, framework-agnostic UI schema standard with protocol layer for AI-generated interfaces. Ships with React (Next.js/RSC) adapter, compressed shorthand for token efficiency, explicit bridges to Open-JSON-UI/AG-UI/MCP Apps, and coarse-to-fine generation patterns.
 
+**Why a UI IR?** Getting reliable structured *data* out of an LLM is a solved, standard practice now — but for *interfaces*, models usually emit throwaway, framework-locked React/HTML that's inconsistent and often inaccessible. UISchema is the validated layer in between: the model targets one schema, every document is validated + accessibility-checked + auto-repaired, and the same schema renders to React, Vue, or the DOM. One contract, any framework, accessible by construction.
+
 ## Clone and Use
 
 Get started in minutes:
@@ -36,11 +38,12 @@ That's it! You're ready to use UISchema in your projects.
 
 ## Quick Start (<5 minutes)
 
-### Install in Your Project
+### Use it
 
-```bash
-npm install @uischema/core @uischema/react
-```
+> The `@uischema/*` packages aren't published to npm yet — clone the monorepo
+> ([Clone and Use](#clone-and-use)) and import them via the npm workspace (or
+> `npm link` the ones you need). Once published this becomes
+> `npm install @uischema/core @uischema/react`.
 
 ### Basic Usage
 
