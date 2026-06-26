@@ -2,7 +2,7 @@
 
 UISchema is a formal, framework-agnostic UI schema standard with protocol layer for AI-generated interfaces. Ships with React (Next.js/RSC) adapter, compressed shorthand for token efficiency, explicit bridges to Open-JSON-UI/AG-UI/MCP Apps, and coarse-to-fine generation patterns.
 
-**Why a UI IR?** Getting reliable structured *data* out of an LLM is a solved, standard practice now — but for *interfaces*, models usually emit throwaway, framework-locked React/HTML that's inconsistent and often inaccessible. UISchema is the validated layer in between: the model targets one schema, every document is validated + accessibility-checked + auto-repaired, and the same schema renders to React, Vue, or the DOM. One contract, any framework, accessible by construction.
+**Why a UI IR?** Getting reliable structured *data* out of an LLM is a solved, standard practice now — but for *interfaces*, models usually emit throwaway, framework-locked React/HTML that's inconsistent and often inaccessible. UISchema is the validated layer in between: the model targets one schema, every document is validated + accessibility-checked + auto-repaired, and the same schema renders to React or Vue (with a framework-agnostic DOM layer for accessibility auditing). One contract, any framework, accessible by construction.
 
 ## Clone and Use
 
@@ -149,7 +149,7 @@ import { UISchemaRenderer } from "@uischema/react"; // or @uischema/vue
 - `@uischema/protocol` - Minimal protocol (patches, events, state)
 - `@uischema/react` - React adapter with DX-first API
 - `@uischema/vue` - Vue 3 adapter
-- `@uischema/dom` - Framework-agnostic DOM adapter (browsers + jsdom)
+- `@uischema/dom` - Framework-agnostic DOM **accessibility** adapter — audits a rendered tree (browsers + jsdom); it is not a renderer (use `@uischema/react` or `@uischema/vue` to render)
 - `@uischema/eval` - WCAG accessibility engine (schema preflight + DOM audit)
 - `@uischema/cli` - Validation CLI, preview server, type generation
 
